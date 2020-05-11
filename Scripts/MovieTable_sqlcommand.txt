@@ -3,11 +3,11 @@ t.production_companies,t.popularity,t.original_language,i.runtimeminutes,t.direc
 t.actor1_name,t.actor1_gender,t.actor2_name,t.actor2_gender,ir.averagerating,ir.numvotes,t.budget,
 t.revenue,t.vote_count,t.vote_average,count(r.rating) as 'ml_rcount',avg(r.rating) as 'ml_rating'
 from ml_movies m
-join ml_links l on (m.movieid = l.movieid)
-join ml_ratings r on (m.movieid = r.movieid)
-join imdb_movies i on ('tt'||l.imdbid = i.tconst)
-join tmdb_movies t on (i.tconst = t.imdb_id)
-join imdb_ratings ir on (i.tconst = ir.tconst)
+join ml_links l on m.movieid = l.movieid
+join ml_ratings r on m.movieid = r.movieid
+join imdb_movies i on 'tt'||l.imdbid = i.tconst
+join tmdb_movies t on i.tconst = t.imdb_id
+join imdb_ratings ir on i.tconst = ir.tconst
 where titletype = 'movie'
 and original_language = 'en'
 group by m.movieid, l.imdbid, l.tmdbid,
