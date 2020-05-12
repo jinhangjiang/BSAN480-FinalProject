@@ -1,0 +1,30 @@
+--Create profitable genre matrix
+CREATE TABLE high_rating_genre_matrix
+    AS
+        SELECT
+            genre.movieid,
+            drama,
+            romance,
+            thriller,
+            comedy,
+            sci_fi,
+            adventure,
+            animation,
+            children,
+            imax,
+            musical,
+            action,
+            mystery,
+            crime,
+            war,
+            western,
+            fantasy,
+            horror,
+            documentary,
+            film_noir,
+            no_genre
+        FROM
+            genre_matrix genre
+            JOIN movie ON genre.movieid = movie.movieid
+        WHERE
+            ml_rating >= 3.5;
