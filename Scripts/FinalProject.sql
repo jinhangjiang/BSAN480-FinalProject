@@ -11,7 +11,10 @@ SELECT
 FROM
     movie
 WHERE
-    startyear > '2005';
+    startyear > '2005'
+    AND revenue > 100000000
+GROUP BY
+    startyear;
 
 ---2. Categorize #1 by genre.
 
@@ -89,7 +92,14 @@ FROM
     movie
 WHERE
     revenue != 0
-    AND budget != 0;
+    AND budget != 0
+ORDER BY
+    "Profit Margin" DESC;
+
+
+
+
+---------------------------------
 
 SELECT
     *
@@ -102,3 +112,6 @@ FROM
     movie
 WHERE
     ml_rating > 4.5;
+    
+--Create profitable genre matrix
+
