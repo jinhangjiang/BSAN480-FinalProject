@@ -1,0 +1,77 @@
+---
+title: "NLP Over Movie Data"
+author: "Jinhang Jiang"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+
+## Load data and find cut off
+```{r}
+tag<- read.csv("tag.csv")
+quantile(tag$RELEVANCE, probs = seq(0,1,0.10))
+
+tag.top<-tag[tag$RELEVANCE>=0.2905,]
+text<- tag.top$TAG
+```
+
+## Load packages
+```{r}
+library("NLP")
+library("tm")
+library("SnowballC")
+library("RColorBrewer")
+library("wordcloud2")
+```
+## Clean text
+```{r}
+docs<-Corpus(VectorSource(text))
+docs<-tm_map(docs, removeNumbers)
+docs<-tm_map(docs, removePunctuation)
+docs<-tm_map(docs, stripWhitespace)
+docs<-tm_map(docs, removeWords, stopwords("en"))
+docs<-tm_map(docs, removeWords, c("good", "great", "bad", "best", "movie", "notable","full","based","nudity","oscar", stopwords("english")))
+```
+
+```{r}
+dtm<-TermDocumentMatrix(docs)
+matrix<-as.matrix(dtm)
+words<-sort(rowSums(matrix), decreasing=TRUE)
+
+df<-data.frame(word=names(words), freq=words)
+```
+
+## Prepare word clouds
+```{r}
+set.seed(1)
+wordcloud2(data = df, size = 1.5, color = 'random-dark')
+
+```
+
+## Do Sentiment Analysis
+```{r}
+library("syuzhet")
+text<-gsub("[][!#$%()*,.:;<=>@^_`|~.{}]", "", text)
+t<-as.vector(text)
+mysentiment<-get_nrc_sentiment((t))
+
+## calculate total score for each sentiment
+Sentimentscores<-data.frame(colSums(mysentiment[,]))
+```
+
+## Plot
+```{r}
+names(Sentimentscores)<-"Score"
+Sentimentscores<-cbind("sentiment"=rownames(Sentimentscores),Sentimentscores)
+rownames(Sentimentscores)<-NULL
+
+#plotting the sentiments with scores
+library(ggplot2)
+
+
+
+ggplot(data=Sentimentscores,aes(y=sentiment,x=Score))+geom_bar(aes(fill=sentiment),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Sentiments")+ylab("Scores")+ggtitle("Sentiments of Tags of the Top Rated Movies")
+```
