@@ -1,5 +1,5 @@
 movie<- read.csv("movie.csv")
-movie_new<-movie
+movie_new<-read.csv("movie_new.csv")
 
 
 #### exclude unnecessary variables & transform extreme values
@@ -72,9 +72,61 @@ write.csv(movie_new, file = "movie_new.csv")
 
 tmd$no_genre<- movie_new$NO_GENRE
 write.csv(tmd, file = "genre_matrix.csv")
-### make categorical variables
 
 
 
 
+
+
+### 05/12/2020 final clean up
+
+movie<-read.csv("cleandata.csv")
+data<-read.csv("movie.csv")
+movie$budget_origin<-data$BUDGET
+head(movie$budget_origin)
+movie$X.1<-NULL
+movie<-movie%>%
+  rename(movieid = X)
+
+data1<-data[,c("MOVIEID","BUDGET")]
+
+movie<-movie%>%
+  rename(budget_log=BUDGET)
+movie$budget_origin<-NULL
+
+movie<-merge(x=movie,y=data1,by=1, all.x = TRUE)
+movie$movieid<-data$MOVIEID
+movie[movie$movieid==3257,]
+
+
+
+movie<-read.csv("cleandata.csv")
+movie$X<-NULL
+movie$NUMVOTESlog<-log(movie$NUMVOTES)
+movie$ML_RCOUNTlog<-log(movie$ML_RCOUNT)
+
+library(dplyr)
+movie<-movie%>%
+  mutate(Director_Sex=case_when(
+    .$DIRECTOR_GENDER == 2 ~ "M",
+    .$DIRECTOR_GENDER == 1 ~ "F",
+    .$DIRECTOR_GENDER == 0 ~ "N"
+  ))
+
+movie<-movie%>%
+  mutate(Actor1_Sex=case_when(
+    .$ACTOR1_GENDER == 2 ~ "M",
+    .$ACTOR1_GENDER == 1 ~ "F",
+    .$ACTOR1_GENDER == 0 ~ "N"
+  ))
+
+
+movie<-movie%>%
+  mutate(PERFORMANCE=case_when(
+    .$AVERAGERATING >=7 ~ 1,
+    .$AVERAGERATING <7 ~ 0
+  ))
+
+movie$X<-NULL
+write.csv(movie, file = "cleandata.csv")
 
